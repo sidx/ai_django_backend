@@ -12,15 +12,16 @@ def todolist(request):
     todolist = Todo.objects.filter(flag=1)
     finishtodos = Todo.objects.filter(flag=0)
     return render(request, 'todo/simpleTodo.html',
-                          {'todolist': todolist,
+                  {'todolist': todolist,
                            'finishtodos': finishtodos})
+
 
 def todolist_json(request):
     todolist = json.loads(
         serializers.serialize(
-            'json', Todo.objects.filter(flag=1).all().order_by('-pubtime'), fields=('todo','flag', 'priority', 'pubtime'
-                )
-            ))
+            'json', Todo.objects.filter(flag=1).all().order_by('-pubtime'), fields=('todo', 'flag', 'priority', 'pubtime'
+                                                                                    )
+        ))
     # finishtodos = json.loads(
     #     serializers.serialize(
     #         'json', Todo.objects.filter(flag=0).all().order_by('-pubtime'), fields=('todo','flag', 'priority', 'pubtime'
@@ -30,6 +31,7 @@ def todolist_json(request):
     # print data
     return JsonResponse(todolist, safe=False)
 
+
 def do_action(request):
     action = request.GET.get('task_action', None)
     if action:
@@ -37,7 +39,6 @@ def do_action(request):
         if number:
             tasks = Todo.objects.all().order_by('-pubtime')
             number.sort(reverse=True)
-            print action
             ids = []
             for i in number:
                 ids.append(tasks[int(i)].id)
@@ -49,6 +50,7 @@ def do_action(request):
                 Todo.objects.filter(id__in=ids).delete()
     return
 
+
 def todofinish(request, id=''):
     todo = Todo.objects.get(id=id)
     if todo.flag == '1':
@@ -59,6 +61,7 @@ def todofinish(request, id=''):
     return render(request, 'todo/simpleTodo.html',
                            {'todolist': todolist})
 
+
 def todoback(request, id=''):
     todo = Todo.objects.get(id=id)
     if todo.flag == '0':
@@ -67,6 +70,7 @@ def todoback(request, id=''):
         return HttpResponseRedirect('/todos/')
     todolist = Todo.objects.filter(flag=1)
     return render(request, 'todo/simpleTodo.html', {'todolist': todolist})
+
 
 def tododelete(request, id=''):
     try:
@@ -79,6 +83,7 @@ def tododelete(request, id=''):
     todolist = Todo.objects.filter(flag=1)
     return render(reqeust, 'todo/simpleTodo.html', {'todolist': todolist})
 
+
 def addTodo(request):
     if request.method == 'POST':
         atodo = request.POST['todo']
@@ -89,14 +94,15 @@ def addTodo(request):
         todolist = Todo.objects.filter(flag='1')
         finishtodos = Todo.objects.filter(flag=0)
         return render(request, 'todo/showtodo.html',
-                              {'todolist': todolist, 
+                      {'todolist': todolist,
                                'finishtodos': finishtodos})
     else:
         todolist = Todo.objects.filter(flag=1)
         finishtodos = Todo.objects.filter(flag=0)
         return render(request, 'todo/simpleTodo.html',
-                              {'todolist': todolist, 
+                      {'todolist': todolist,
                                'finishtodos': finishtodos})
+
 
 def updatetodo(request, id=''):
     if request.method == 'POST':
@@ -116,4 +122,3 @@ def updatetodo(request, id=''):
         except Exception:
             raise Http404
         return render(request, 'todo/updatetodo.html', {'todo': todo})
-
