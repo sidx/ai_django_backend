@@ -1,9 +1,11 @@
+import json
 from django.shortcuts import render
 from django.template import RequestContext
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from .models import Todo
+from django.core import serializers
 
 
 def todolist(request):
@@ -12,6 +14,40 @@ def todolist(request):
     return render(request, 'todo/simpleTodo.html',
                           {'todolist': todolist,
                            'finishtodos': finishtodos})
+
+def todolist_json(request):
+    todolist = json.loads(
+        serializers.serialize(
+            'json', Todo.objects.filter(flag=1).all().order_by('-pubtime'), fields=('todo','flag', 'priority', 'pubtime'
+                )
+            ))
+    # finishtodos = json.loads(
+    #     serializers.serialize(
+    #         'json', Todo.objects.filter(flag=0).all().order_by('-pubtime'), fields=('todo','flag', 'priority', 'pubtime'
+    #             )
+    #         ))
+    # data =({"todolist": todolist, "finishtodos": finishtodos})
+    # print data
+    return JsonResponse(todolist, safe=False)
+
+def do_action(request):
+    action = request.GET.get('task_action', None)
+    if action:
+        number = request.GET.getlist('number', [])
+        if number:
+            tasks = Todo.objects.all().order_by('-pubtime')
+            number.sort(reverse=True)
+            print action
+            ids = []
+            for i in number:
+                ids.append(tasks[int(i)].id)
+            if action == 'complete':
+                Todo.objects.filter(id__in=ids).update(flag=0)
+            elif action == 'incomplete':
+                Todo.objects.filter(id__in=ids).update(flag=1)
+            elif action == 'delete':
+                Todo.objects.filter(id__in=ids).delete()
+    return
 
 def todofinish(request, id=''):
     todo = Todo.objects.get(id=id)
