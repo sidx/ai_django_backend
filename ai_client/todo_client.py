@@ -5,7 +5,7 @@ except ImportError:
     from urllib import urljoin
 import json
 
-master_url = "http://localhost:8000/todos/"
+master_url = "http://localhost:8000/"
 
 def process_tasks(ai_data):
     metadata = ai_data['metadata']
@@ -22,7 +22,9 @@ def process_tasks(ai_data):
 
 def fetch_tasks(param_data):
     url = urljoin(master_url, 'listjson') + '/'
-    response = get_result(url, {})
+    print '--------------'
+    print (url)
+    response = get_result(url, param_data)
     return response.content
 
 def create_tasks(param_data):
@@ -31,5 +33,7 @@ def create_tasks(param_data):
 def do_action_on_task(param_data):
     if param_data['task_action']:
         url = urljoin(master_url, 'do_action') + '/'
+        print '--------------'
+        print (url)
         response = get_result(url, param_data)
         return response.content

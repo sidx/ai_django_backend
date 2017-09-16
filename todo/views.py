@@ -17,9 +17,28 @@ def todolist(request):
 
 
 def todolist_json(request):
+    param_dict = request.GET if request.method=='GET' else request.POST
+    todo_priority = param_dict.get('todo_priority', 0)
+    task_number = param_dict.get('task_number', 'all')
+    task_fetch_order = param_dict.get('task_fetch_order', 'latest')
+    task_status = param_dict.get('task_status', None)
+    if int(todo_priority) == 0:
+        filter_dict = dict(priority__in=[1,2,3])
+    else:
+        filter_dict = dict(priority=int(todo_priority))
+    if task_status:
+        filter_dict.update({'flag': int(task_status)})
+    if task_fetch_order == 'latest':
+        order_by = '-pubtime'
+    else:
+        order_by = 'pubtime'
+    if not task_number or task_number == 'all':
+        task_number = None
+    else:
+        task_number = int(task_number)
     todolist = json.loads(
         serializers.serialize(
-            'json', Todo.objects.filter(flag=1).all().order_by('-pubtime'), fields=('todo', 'flag', 'priority', 'pubtime'
+            'json', Todo.objects.filter(**filter_dict).all().order_by(order_by)[:task_number], fields=('todo', 'flag', 'priority', 'pubtime'
                                                                                     )
         ))
     # finishtodos = json.loads(
@@ -28,7 +47,7 @@ def todolist_json(request):
     #             )
     #         ))
     # data =({"todolist": todolist, "finishtodos": finishtodos})
-    # print data
+    print todolist
     return JsonResponse(todolist, safe=False)
 
 
