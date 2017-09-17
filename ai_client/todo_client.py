@@ -28,6 +28,8 @@ def fetch_tasks(param_data):
     return response.content
 
 def create_tasks(param_data):
+    url = urljoin(master_url, 'addtodojson') + '/'
+    response = post_result(url, param_data)
     return {'status': "success", 'message': "Task Created"}
 
 def do_action_on_task(param_data):

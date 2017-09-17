@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.http import Http404, JsonResponse
 from .models import Todo
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 
 
 def todolist(request):
@@ -104,6 +105,27 @@ def tododelete(request, id=''):
 
 
 def addTodo(request):
+    if request.method == 'POST':
+        atodo = request.POST['todo']
+        priority = request.POST['priority']
+        user = User.objects.get(id='1')
+        todo = Todo(user=user, todo=atodo, priority=priority, flag='1')
+        todo.save()
+        todolist = Todo.objects.filter(flag='1')
+        finishtodos = Todo.objects.filter(flag=0)
+        return render(request, 'todo/showtodo.html',
+                      {'todolist': todolist,
+                               'finishtodos': finishtodos})
+    else:
+        todolist = Todo.objects.filter(flag=1)
+        finishtodos = Todo.objects.filter(flag=0)
+        return render(request, 'todo/simpleTodo.html',
+                      {'todolist': todolist,
+                               'finishtodos': finishtodos})
+
+
+@csrf_exempt
+def addTodoJson(request):
     if request.method == 'POST':
         atodo = request.POST['todo']
         priority = request.POST['priority']
