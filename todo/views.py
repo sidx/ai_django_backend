@@ -170,8 +170,8 @@ def web_hook_test(request):
     data = {
                 "speech": "Barack Hussein Obama II was the 44th and current President of the United States.",
                 "displayText": "Barack Hussein Obama II was the 44th and current President of the United States, and the first African American to hold the office. Born in Honolulu, Hawaii, Obama is a graduate of Columbia University   and Harvard Law School, where ",
-                "data": '',
-                "contextOut": '',
+                "data": {"facebook": "Bingo"},
+                "contextOut": [{"name":"weather", "lifespan":2, "parameters":{"city":"Rome"}}],
                 "source": "DuckDuckGo"
                 }
     return JsonResponse(data, safe=False)
