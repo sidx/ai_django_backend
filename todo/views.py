@@ -163,3 +163,14 @@ def updatetodo(request, id=''):
         except Exception:
             raise Http404
         return render(request, 'todo/updatetodo.html', {'todo': todo})
+
+
+def web_hook_test(request):
+    data = {
+                "speech": "Barack Hussein Obama II was the 44th and current President of the United States.",
+                "displayText": "Barack Hussein Obama II was the 44th and current President of the United States, and the first African American to hold the office. Born in Honolulu, Hawaii, Obama is a graduate of Columbia University   and Harvard Law School, where ",
+                "data": '',
+                "contextOut": '',
+                "source": "DuckDuckGo"
+                }
+    return JsonResponse(data, safe=False)

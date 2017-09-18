@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^tododelete/(?P<id>\d+)/$', views.tododelete, name='delete'),
     url(r'^listjson/$', views.todolist_json, name='listjson'),
     url(r'^do_action/$', views.do_action, name='do_action'),
+    url(r'^web_hook_test/$', views.web_hook_test, name='web_hook'),
 ]

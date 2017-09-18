@@ -3,3 +3,4 @@
 *.pyc
 .gitignore
 local_settings.py
+.idea
