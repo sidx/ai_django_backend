@@ -165,6 +165,7 @@ def updatetodo(request, id=''):
         return render(request, 'todo/updatetodo.html', {'todo': todo})
 
 
+@csrf_exempt
 def web_hook_test(request):
     data = {
                 "speech": "Barack Hussein Obama II was the 44th and current President of the United States.",
