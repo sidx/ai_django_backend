@@ -173,8 +173,8 @@ def updatetodo(request, id=''):
 @csrf_exempt
 def web_hook_test(request):
     print('Request:')
-    print(json.dumps(request.get('data'), indent=4))
-    res = processRequest(request)
+    print(json.dumps(request.POST.get('data'), indent=4))
+    res = processRequest(request.POST)
 
     res = json.dumps(res, indent=4)
     return JsonResponse(res, safe=False)
