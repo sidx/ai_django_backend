@@ -8,9 +8,9 @@ from .models import Todo
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
+from urllib2 import urlopen, Request
 from urllib.parse import urlparse, urlencode
-from urllib.request import urlopen, Request
-from urllib.error import HTTPError
+# from urllib.error import HTTPError
 
 
 def todolist(request):
