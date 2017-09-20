@@ -9,12 +9,12 @@ master_url = "http://localhost:8000/"
 
 def process_tasks(ai_data):
     metadata = ai_data['metadata']
-    if metadata['intentName'] == "fetch.task":
+    if metadata['action'] == "fetchtask":
         result = fetch_tasks(ai_data['parameters'])
         result_dict = json.loads(result)
-    elif metadata['intentName'] == "create.task":
+    elif metadata['action'] == "create.task":
         result = create_tasks(ai_data['parameters'])
-    elif metadata['intentName'] == "fetch.task - select.number":
+    elif metadata['action'] == "fetchtask-selectnumber":
         result = do_action_on_task(ai_data['parameters'])
     else:
         return
