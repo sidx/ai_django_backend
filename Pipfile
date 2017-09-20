@@ -3,11 +3,12 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [packages]
+
 dj-database-url = "*"
 gunicorn = "*"
 psycopg2 = "*"
 whitenoise = "*"
-apiai = '*'
+apiai = "*"
 certifi = "*"
 chardet = "*"
 django = "*"
@@ -17,6 +18,8 @@ pytz = "*"
 requests = "*"
 urllib3 = "*"
 wheel = "*"
+django-rest-framework = "*"
+django-extensions = "*"
 
 
 [requires]

@@ -1,15 +1,20 @@
 import json
 from django.shortcuts import render
-from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.http import Http404, JsonResponse
 from .models import Todo
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
-from urllib2 import urlopen, Request
+from urllib2 import urlopen
 from urllib import urlencode
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import permissions
+from rest_framework.decorators import permission_classes
 
 # from urllib.error import HTTPError
 
@@ -106,7 +111,17 @@ def tododelete(request, id=''):
         todo.delete()
         return HttpResponseRedirect('/todos/')
     todolist = Todo.objects.filter(flag=1)
-    return render(reqeust, 'todo/simpleTodo.html', {'todolist': todolist})
+    return render(request, 'todo/simpleTodo.html', {'todolist': todolist})
+
+
+def delete_todo(task_order=None):
+    try:
+        todo = Todo.objects.all()[:task_order].last()
+        response = todo.todo
+        todo.delete()
+        return True, 'Deleted task `{todo}` successfully.'.format(todo=response)
+    except Todo.DoesNotExist:
+        return False, 'Sorry there is no such task.'
 
 
 def addTodo(request):
@@ -170,78 +185,42 @@ def updatetodo(request, id=''):
         return render(request, 'todo/updatetodo.html', {'todo': todo})
 
 
-@csrf_exempt
-def web_hook_test(request, **kwargs):
-    print('Request:')
-    print(json.dumps(request.POST, indent=4))
-    print(json.dumps(kwargs, indent=4))
-    res = processRequest(request.POST)
+class WebHookViewSet(APIView):
 
-    res = json.dumps(res, indent=4)
-    return JsonResponse(res, safe=False)
+    def post(self, request, *args, **kwargs):
+        """
+        Sample request https://jsonblob.com/caf7ab45-9d9b-11e7-aa97-2105734715bc
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        data = request.data
+        result = data.get('result')
+        parameters = None
+        user = User.objects.get(id=1)
+        response = dict()
+        if result and 'parameters' in result:
+            parameters = result.get('parameters')
+        if result.get('action') == 'create.task':
+            if parameters:
+                priority = parameters.get('priority')
+                todo = parameters.get('todo')
+                todo_instance = Todo(user=user, todo=todo, priority=priority, flag='1')
+                todo_instance.save()
+                response['speech'] = response['displayText'] \
+                    = "You'll be reminded about '{todo}' with {priority_text} priority."\
+                    .format(todo=todo, priority_text=todo_instance.priority_text)
+            else:
+                response['speech'] = response['displayText'] \
+                    = "No clue, what to do"
 
+        elif result.get('action') == 'delete.task':
+            try:
+                task_number = int(parameters.get('task_number'))
+                action_status, message = delete_todo(task_number)
+                response['speech'] = response['displayText'] = message
+            except Exception as e:
+                response['speech'] = response['displayText'] = 'No clue, what to do'
 
-def processRequest(req):
-    if req.get("result").get("action") != "yahooWeatherForecast":
-        return {}
-    baseurl = "https://query.yahooapis.com/v1/public/yql?"
-    yql_query = makeYqlQuery(req)
-    if yql_query is None:
-        return {}
-    yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
-    result = urlopen(yql_url).read()
-    data = json.loads(result)
-    res = makeWebhookResult(data)
-    return res
-
-
-def makeYqlQuery(req):
-    result = req.get("result")
-    parameters = result.get("parameters")
-    city = parameters.get("geo-city")
-    if city is None:
-        return None
-
-    return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
-
-
-def makeWebhookResult(data):
-    query = data.get('query')
-    if query is None:
-        return {}
-
-    result = query.get('results')
-    if result is None:
-        return {}
-
-    channel = result.get('channel')
-    if channel is None:
-        return {}
-
-    item = channel.get('item')
-    location = channel.get('location')
-    units = channel.get('units')
-    if (location is None) or (item is None) or (units is None):
-        return {}
-
-    condition = item.get('condition')
-    if condition is None:
-        return {}
-
-    # print(json.dumps(item, indent=4))
-
-    speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
-             ", the temperature is " + condition.get('temp') + " " + units.get('temperature')
-
-    print("Response:")
-    print(speech)
-
-    return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "apiai-weather-webhook-sample"
-    }
-
-
+        return Response(data=response, status=status.HTTP_200_OK)
