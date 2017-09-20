@@ -1,12 +1,22 @@
 import json
 from django.shortcuts import render
-from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.http import Http404, JsonResponse
 from .models import Todo
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
+
+from urllib2 import urlopen
+from urllib import urlencode
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import permissions
+from rest_framework.decorators import permission_classes
+
+# from urllib.error import HTTPError
 
 
 def todolist(request):
@@ -101,7 +111,17 @@ def tododelete(request, id=''):
         todo.delete()
         return HttpResponseRedirect('/todos/')
     todolist = Todo.objects.filter(flag=1)
-    return render(reqeust, 'todo/simpleTodo.html', {'todolist': todolist})
+    return render(request, 'todo/simpleTodo.html', {'todolist': todolist})
+
+
+def delete_todo(task_order=None):
+    try:
+        todo = Todo.objects.all()[:task_order].last()
+        response = todo.todo
+        todo.delete()
+        return True, 'Deleted task `{todo}` successfully.'.format(todo=response)
+    except Todo.DoesNotExist:
+        return False, 'Sorry there is no such task.'
 
 
 def addTodo(request):
@@ -163,3 +183,44 @@ def updatetodo(request, id=''):
         except Exception:
             raise Http404
         return render(request, 'todo/updatetodo.html', {'todo': todo})
+
+
+class WebHookViewSet(APIView):
+
+    def post(self, request, *args, **kwargs):
+        """
+        Sample request https://jsonblob.com/caf7ab45-9d9b-11e7-aa97-2105734715bc
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        data = request.data
+        result = data.get('result')
+        parameters = None
+        user = User.objects.get(id=1)
+        response = dict()
+        if result and 'parameters' in result:
+            parameters = result.get('parameters')
+        if result.get('action') == 'create.task':
+            if parameters:
+                priority = parameters.get('priority')
+                todo = parameters.get('todo')
+                todo_instance = Todo(user=user, todo=todo, priority=priority, flag='1')
+                todo_instance.save()
+                response['speech'] = response['displayText'] \
+                    = "You'll be reminded about '{todo}' with {priority_text} priority."\
+                    .format(todo=todo, priority_text=todo_instance.priority_text)
+            else:
+                response['speech'] = response['displayText'] \
+                    = "No clue, what to do"
+
+        elif result.get('action') == 'delete.task':
+            try:
+                task_number = int(parameters.get('task_number'))
+                action_status, message = delete_todo(task_number)
+                response['speech'] = response['displayText'] = message
+            except Exception as e:
+                response['speech'] = response['displayText'] = 'No clue, what to do'
+
+        return Response(data=response, status=status.HTTP_200_OK)

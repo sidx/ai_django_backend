@@ -16,6 +16,17 @@ class Todo(models.Model):
     def __unicode__(self):
         return u'%d %s %s' % (self.id, self.todo, self.flag)
 
+    @property
+    def priority_text(self):
+        priority_text = ''
+        if self.priority == '1':
+            priority_text = 'High'
+        elif self.priority == '2':
+            priority_text = 'Medium'
+        elif self.priority == '3':
+            priority_text = 'Low'
+        return priority_text
+
     class Meta:
         ordering = ['priority', 'pubtime']
 
