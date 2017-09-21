@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import dj_database_url
+import pyrebase
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +28,6 @@ SECRET_KEY = 'fgtdv_+bkc&v2$mj(hckxgywl!9-21^l)_cu0j-$3knjt)yuho'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -78,7 +78,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'simple_todo.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
@@ -96,7 +95,6 @@ DATABASES['default']['TEST'] = {'NAME': DATABASES['default']['NAME']}
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -116,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -129,7 +126,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -154,3 +150,15 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
 
 }
+
+# Firebase
+
+config = {
+    "apiKey": "AIzaSyAWFeBs2GG9-9fkX9xkWK4W2C1batfXDzI",
+    "authDomain": "jinx-991c3.firebaseapp.com",
+    "databaseURL": "https://jinx-991c3.firebaseio.com",
+    "storageBucket": "jinx-991c3.appspot.com",
+    "serviceAccount": os.path.join(PROJECT_ROOT, 'firebase.json')
+}
+
+firebase = pyrebase.initialize_app(config)
