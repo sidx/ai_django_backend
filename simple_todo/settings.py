@@ -157,6 +157,7 @@ config = {
     "apiKey": "AIzaSyAWFeBs2GG9-9fkX9xkWK4W2C1batfXDzI",
     "authDomain": "jinx-991c3.firebaseapp.com",
     "databaseURL": "https://jinx-991c3.firebaseio.com",
+    "storageBucket": "jinx-991c3.appspot.com",
     "serviceAccount": os.path.join(PROJECT_ROOT, 'firebase.json')
 }
 
