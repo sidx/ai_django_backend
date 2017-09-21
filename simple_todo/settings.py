@@ -158,7 +158,7 @@ config = {
     "authDomain": "jinx-991c3.firebaseapp.com",
     "databaseURL": "https://jinx-991c3.firebaseio.com",
     "storageBucket": "jinx-991c3.appspot.com",
-    "serviceAccount": os.path.join(PROJECT_ROOT, 'firebase.json')
+    "serviceAccount": os.path.join(BASE_DIR, 'firebase.json')
 }
 
 firebase = pyrebase.initialize_app(config)
