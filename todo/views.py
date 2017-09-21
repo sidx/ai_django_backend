@@ -86,7 +86,7 @@ def todofinish(request, id=''):
     if todo.flag == '1':
         todo.flag = '0'
         todo.save()
-        return HttpResponseRedirect('/todos/')
+        return HttpResponseRedirect('/')
     todolist = Todo.objects.filter(flag=1)
     return render(request, 'todo/simpleTodo.html',
                            {'todolist': todolist})
@@ -97,7 +97,7 @@ def todoback(request, id=''):
     if todo.flag == '0':
         todo.flag = '1'
         todo.save()
-        return HttpResponseRedirect('/todos/')
+        return HttpResponseRedirect('/')
     todolist = Todo.objects.filter(flag=1)
     return render(request, 'todo/simpleTodo.html', {'todolist': todolist})
 
@@ -109,7 +109,7 @@ def tododelete(request, id=''):
         raise Http404
     if todo:
         todo.delete()
-        return HttpResponseRedirect('/todos/')
+        return HttpResponseRedirect('/')
     todolist = Todo.objects.filter(flag=1)
     return render(request, 'todo/simpleTodo.html', {'todolist': todolist})
 
@@ -170,13 +170,13 @@ def updatetodo(request, id=''):
         try:
             todo = Todo.objects.get(id=id)
         except Exception:
-            return HttpResponseRedirect('/todos/')
+            return HttpResponseRedirect('/')
         atodo = request.POST['todo']
         priority = request.POST['priority']
         todo.todo = atodo
         todo.priority = priority
         todo.save()
-        return HttpResponseRedirect('/todos/')
+        return HttpResponseRedirect('/')
     else:
         try:
             todo = Todo.objects.get(id=id)
@@ -221,6 +221,79 @@ class WebHookViewSet(APIView):
                 action_status, message = delete_todo(task_number)
                 response['speech'] = response['displayText'] = message
             except Exception as e:
-                response['speech'] = response['displayText'] = 'No clue, what to do'
+                response['speech'] = response['displayText'] \
+                                    = 'No clue, what to do'
 
+        elif result.get('action') == 'fetchtask':
+            try:
+                if parameters:
+                    priority = parameters.get('priority', None)
+                    task_number = parameters.get('task_number', 'all')
+                    task_order = parameters.get('task_order', 'latest')
+                    task_status = parameters.get('task_status', None)
+                    if int(todo_priority) == 0:
+                        filter_dict = dict(priority__in=[1,2,3])
+                    else:
+                        filter_dict = dict(priority=int(todo_priority))
+                    if task_status:
+                        filter_dict.update({'flag': int(task_status)})
+                    if task_fetch_order == 'latest':
+                        order_by = '-pubtime'
+                    else:
+                        order_by = 'pubtime'
+                    if not task_number or task_number == 'all':
+                        task_number = None
+                    else:
+                        task_number = int(task_number)
+                    todolist = Todo.objects.filter(**filter_dict)\
+                                    .values_list('todo', flat=True)\
+                                    .order_by(order_by)[:task_number]
+                    if todolist:
+                        response['speech'] = response['displayText'] \
+                        = "Here are your tasks " + ', '.join(todolist)
+                    else:
+                        pass
+                    response['speech'] = response['displayText'] \
+                        = "Sorry, no tasks matched your request"
+                else:
+                    response['speech'] = response['displayText'] \
+                        = "No clue, what to do"
+            except Exception as e:
+                response['speech'] = response['displayText'] \
+                                    = 'No clue, what to do'
+        elif result.get('action') == 'fetchtask-selectnumber':
+            try:
+                if parameters:
+                    task_number = parameters.get('task_action', None)
+                    task_order = parameters.get('number', [])
+                    if int(todo_priority) == 0:
+                        filter_dict = dict(priority__in=[1,2,3])
+                    else:
+                        filter_dict = dict(priority=int(todo_priority))
+                    if task_status:
+                        filter_dict.update({'flag': int(task_status)})
+                    if task_fetch_order == 'latest':
+                        order_by = '-pubtime'
+                    else:
+                        order_by = 'pubtime'
+                    if not task_number or task_number == 'all':
+                        task_number = None
+                    else:
+                        task_number = int(task_number)
+                    todolist = Todo.objects.filter(**filter_dict).values_list\
+                                ('todo', flat=True)\
+                                .order_by(order_by)[:task_number]
+                    if todolist:
+                        response['speech'] = response['displayText'] \
+                        = "Here are your tasks " + ', '.join(todolist)
+                    else:
+                        pass
+                        response['speech'] = response['displayText'] \
+                            = "Sorry, no tasks matched your request"
+                else:
+                    response['speech'] = response['displayText'] \
+                        = "No clue, what to do"
+            except Exception as e:
+                response['speech'] = response['displayText'] = 'No clue, what\
+                 to do'
         return Response(data=response, status=status.HTTP_200_OK)
