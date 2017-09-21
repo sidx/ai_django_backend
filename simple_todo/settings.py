@@ -161,4 +161,4 @@ config = {
     "serviceAccount": os.path.join(PROJECT_ROOT, 'firebase.json')
 }
 
-firebase = pyrebase.initialize_app(config)
+# firebase = pyrebase.initialize_app(config)
