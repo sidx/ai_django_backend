@@ -14,4 +14,6 @@ urllib3==1.22
 wheel==0.24.0
 django-extensions==1.9.1
 djangorestframework==3.6.4
-
+redis==2.10.6
+celery==4.1.0
+pyrebase==3.0.27
