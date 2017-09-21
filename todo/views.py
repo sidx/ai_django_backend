@@ -200,9 +200,7 @@ class WebHookViewSet(APIView):
         parameters = None
         user = User.objects.get(id=1)
         response = dict()
-        print data
-        print '-------------------'
-        print result
+        print result.get('action')
         if result and 'parameters' in result:
             parameters = result.get('parameters')
         if result.get('action') == 'create.task':
