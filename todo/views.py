@@ -231,7 +231,7 @@ class WebHookViewSet(APIView):
 
                     todo_priority = parameters.get('priority', 0)
                     task_number = parameters.get('task_number', 'all')
-                    task_fetch_order = parameters.get('task_order', 'latest')
+                    task_fetch_order = parameters.get('task_fetch_order', 'latest')
                     task_status = parameters.get('task_status', None)
                     if int(todo_priority) == 0:
                         filter_dict = dict(priority__in=[1, 2, 3])
@@ -265,9 +265,11 @@ class WebHookViewSet(APIView):
         elif result.get('action') == 'fetchtask-selectnumber':
             try:
                 if parameters:
-                    task_number = parameters.get('task_action', None)
-                    todo_priority = parameters.get('priority', None)
-                    task_fetch_order = parameters.get('number', [])
+                    task_action = parameters.get('task_action', None)
+                    task_number = parameters.get('task_number', 'all')
+                    todo_priority = parameters.get('priority', 0)
+                    number = parameters.get('number', [])
+                    task_fetch_order = parameters.get('task_fetch_order', 'latest')
                     task_status = parameters.get('task_status', None)
                     if int(todo_priority) == 0:
                         filter_dict = dict(priority__in=[1, 2, 3])
@@ -283,20 +285,26 @@ class WebHookViewSet(APIView):
                         task_number = None
                     else:
                         task_number = int(task_number)
-                    todolist = Todo.objects.filter(**filter_dict).values_list \
-                                   ('todo', flat=True) \
-                                   .order_by(order_by)[:task_number]
-                    if todolist:
+                    todolist = Todo.objects.filter(**filter_dict) \
+                                   .order_by(order_by).all()[:task_number]
+                    requested_task_ids = [todolist[i-1].id for i in number]
+                    requested_tasks = Todo.objects.filter(id__in=requested_task_ids)
+                    if requested_tasks and task_action:
+                        if task_action == 'complete':
+                            requested_tasks.update(flag=0)
+                        elif task_action == 'incomplete':
+                            requested_tasks.update(flag=1)
                         response['speech'] = response['displayText'] \
-                            = "Here are your tasks " + ', '.join(todolist)
+                            = "Following tasks have been marked as " + task_action + '-' + ', '.join([i.todo for i in requested_tasks])
                     else:
                         pass
                         response['speech'] = response['displayText'] \
-                            = "Sorry, no tasks matched your request"
+                            = "Sorry, I didn't understand what to do"
                 else:
                     response['speech'] = response['displayText'] \
                         = "No clue, what to do"
             except Exception as e:
+                print e
                 response['speech'] = response['displayText'] = 'No clue, what\
                  to do'
 
