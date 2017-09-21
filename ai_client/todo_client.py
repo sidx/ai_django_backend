@@ -8,23 +8,24 @@ import json
 master_url = "http://localhost:8000/"
 
 def process_tasks(ai_data):
-    metadata = ai_data['metadata']
-    if metadata['action'] == "fetchtask":
-        result = fetch_tasks(ai_data['parameters'])
+    metadata = ai_data['result']['metadata']
+    if ai_data['result']['action'] == "fetchtask":
+        result = fetch_tasks(ai_data)
+        print type(result)
         result_dict = json.loads(result)
-    elif metadata['action'] == "create.task":
-        result = create_tasks(ai_data['parameters'])
-    elif metadata['action'] == "fetchtask-selectnumber":
-        result = do_action_on_task(ai_data['parameters'])
+    elif ai_data['result']['action'] == "create.task":
+        result = create_tasks(ai_data['result']['parameters'])
+    elif ai_data['result']['action'] == "fetchtask-selectnumber":
+        result = do_action_on_task(ai_data['result']['parameters'])
     else:
         return
     return result
 
 def fetch_tasks(param_data):
-    url = urljoin(master_url, 'listjson') + '/'
+    url = urljoin(master_url, 'webhook') + '/'
     print '--------------'
-    print (url)
-    response = get_result(url, param_data)
+    print (param_data)
+    response = post_result(url, param_data)
     return response.content
 
 def create_tasks(param_data):

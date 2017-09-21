@@ -200,6 +200,9 @@ class WebHookViewSet(APIView):
         parameters = None
         user = User.objects.get(id=1)
         response = dict()
+        print data
+        print '-------------------'
+        print result
         if result and 'parameters' in result:
             parameters = result.get('parameters')
         if result.get('action') == 'create.task':
@@ -227,6 +230,7 @@ class WebHookViewSet(APIView):
         elif result.get('action') == 'fetchtask':
             try:
                 if parameters:
+                    print parameters
                     priority = parameters.get('priority', None)
                     task_number = parameters.get('task_number', 'all')
                     task_order = parameters.get('task_order', 'latest')
@@ -296,4 +300,5 @@ class WebHookViewSet(APIView):
             except Exception as e:
                 response['speech'] = response['displayText'] = 'No clue, what\
                  to do'
+        print response
         return Response(data=response, status=status.HTTP_200_OK)

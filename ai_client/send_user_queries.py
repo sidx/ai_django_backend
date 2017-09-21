@@ -29,7 +29,7 @@ def main():
             print response['result']['fulfillment']['speech']
             continue
         if not response['result']['actionIncomplete']:
-            task_result = process_tasks(response['result'])
+            task_result = process_tasks(response)
         print response['result']['fulfillment']['speech']
 
 

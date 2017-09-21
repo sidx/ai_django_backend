@@ -3,6 +3,7 @@ import requests
 
 def post_result(url, parameters):
     headers = {'Authorization': ''}
+    headers['Content-type'] = 'application/json'
     params = {'csrfmiddlewaretoken': '{{ csrf_token }}'}
     params.update(parameters)
     response = requests.post(url, data=params, headers=headers)
