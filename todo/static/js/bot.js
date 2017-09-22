@@ -18,8 +18,11 @@ $(document).ready(function () {
     $messages.mCustomScrollbar();
     setTimeout(function () {
         if ('speechSynthesis' in window) {
+            var i = 1;
             window.speechSynthesis.onvoiceschanged = function () {
-                botResponse('');
+                if(i === 1)
+                    botResponse('');
+                i++;
             }
         } else {
             botResponse('');
