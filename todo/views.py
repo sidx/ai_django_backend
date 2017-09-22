@@ -233,12 +233,15 @@ class WebHookViewSet(APIView):
                     task_number = parameters.get('task_number', 'all')
                     task_fetch_order = parameters.get('task_fetch_order', 'latest')
                     task_status = parameters.get('task_status', None)
+                    search = parameters.get('search', None)
                     if int(todo_priority) == 0:
                         filter_dict = dict(priority__in=[1, 2, 3])
                     else:
                         filter_dict = dict(priority=int(todo_priority))
                     if task_status:
                         filter_dict.update({'flag': int(task_status)})
+                    if search:
+                        filter_dict.update({'todo__icontains': search.lower()})
                     if task_fetch_order == 'latest':
                         order_by = '-pubtime'
                     else:
