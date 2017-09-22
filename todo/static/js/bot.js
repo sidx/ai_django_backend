@@ -89,7 +89,7 @@ var Fake = [
 ];
 
 function botResponse(message) {
-    if ($('.message-input').val() !== '') {
+    if ($('.message-input').val() !== '' || typeof  $('.message-input').val() === 'undefined') {
         return false;
     }
     $('<div class="message loading new"><figure class="avatar"><img src="/static/img/bot.png" /></figure><span></span></div>').appendTo($('.mCSB_container'));
