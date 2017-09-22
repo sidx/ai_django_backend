@@ -1,5 +1,6 @@
 const bot = new ApiAi.ApiAiClient({accessToken: 'bdc1904d09de4420964286b9386fb254'});
 
+
 function handleResponse(serverResponse) {
     console.log(serverResponse);
 }
@@ -13,10 +14,16 @@ var $messages = $('.messages-content'),
     d, h, m,
     i = 0;
 
-$(window).load(function () {
+$(document).ready(function () {
     $messages.mCustomScrollbar();
     setTimeout(function () {
-        botResponse('');
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function () {
+                botResponse('');
+            }
+        } else {
+            botResponse('');
+        }
     }, 100);
 });
 
@@ -93,7 +100,20 @@ function botResponse(message) {
         if ($.trim(message) === '') {
             message = Fake[i]
         }
+        if(typeof message === 'undefined'){
+            return false;
+        }
         $('<div class="message new"><figure class="avatar"><img src="/static/img/bot.png" /></figure>' + message + '</div>').appendTo($('.mCSB_container')).addClass('new');
+        if ('speechSynthesis' in window) {
+            var msg = new SpeechSynthesisUtterance();
+            var voices = window.speechSynthesis.getVoices();
+            msg.voice = voices[3];
+            msg.rate = 1;
+            msg.pitch = 1;
+            msg.text = message;
+            speechSynthesis.speak(msg);
+        }
+
         setDate();
         updateScrollbar();
         i++;
