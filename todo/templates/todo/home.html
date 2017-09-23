@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>{% block title %}JINX{% endblock %}</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/chat.min.css">
+    <link rel="stylesheet" href="/static/css/speech.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.min.css">
+    <script src="/static/js/modernizr.js"></script>
+    <script src="/static/js/jquery.js"></script>
+    {% block extra_head %}
+        <style>
+            body{
+                background-image: url("/static/img/jinx_bg.png");
+                background-position: center center;
+                background-repeat:no-repeat;
+            }
+        </style>
+    {% endblock %}
+</head>
+<body>
+<!-- chat -->
+
+<section class="avenue-messenger">
+  <div class="menu">
+   <div class="items"><span>
+     <a href="#" title="Minimize">&mdash;</a><br>
+<!--
+     <a href="">enter email</a><br>
+     <a href="">email transcript</a><br>-->
+     <a href="#" title="End Chat">&#10005;</a>
+
+     </span></div>
+    <div class="button">...</div>
+  </div>
+  <div class="agent-face">
+    <div class="half">
+     <img class="agent circle" src="/static/img/jinx.png" alt="Jesse Tino"></div>
+  </div>
+<div class="chat">
+  <div class="chat-title">
+    <h1>JINX</h1>
+    <h2>PERSONAL ASSISTANT</h2>
+  <!--  <figure class="avatar">
+      <img src="http://askavenue.com/img/17.jpg" /></figure>-->
+  </div>
+  <div class="messages">
+    <div class="messages-content"></div>
+  </div>
+  <div class="message-box">
+    <textarea type="text" class="message-input speech-input" placeholder="Type message..." data-instant-submit="true"></textarea>
+    <button type="submit" class="message-submit"> </button>
+  </div>
+</div>
+  </div>
+</section>
+<!--<div class="bg"></div>-->
+<style>
+
+</style>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.concat.min.js">
+
+</script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.3.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.3.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.3.1/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.3.1/firebase-messaging.js"></script>
+
+<script src="/static/js/ai.js"></script>
+<script src="/static/js/ai.streamless.js"></script>
+<script src="/static/js/bot.js"></script>
+<script src="/static/js/speech.min.js"></script>
+<script>
+    // Initialize Firebase
+    // TODO: Replace with your project's customized code snippet
+    // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyC8mLIREwogYkgIjECiRoOo7ZgMJnRodpY",
+        authDomain: "jinx-991c3.firebaseapp.com",
+        databaseURL: "https://jinx-991c3.firebaseio.com",
+        projectId: "jinx-991c3",
+        storageBucket: "jinx-991c3.appspot.com",
+        messagingSenderId: "882372998375"
+      };
+    firebase.initializeApp(config);
+
+    const messaging = firebase.messaging();
+
+    messaging.onMessage(function (payload) {
+        console.log("Message received. ", payload);
+        // ...
+    });
+
+</script>
+</body>
+</html>

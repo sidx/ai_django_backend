@@ -5,7 +5,9 @@ from rest_framework import routers
 
 urlpatterns = [
     url(r'^webhook/$', views.WebHookViewSet.as_view()),
-    url(r'^$', views.todolist, name='todo'),
+    # url(r'^$', views.todolist, name='todo'),
+    url(r'^$', views.home, name='jinx'),
+    url(r'^todo/$', views.todolist, name='todolist'),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^addtodo/$', views.addTodo, name='add'),
     url(r'^addtodojson/$', views.addTodoJson, name='addjson'),
