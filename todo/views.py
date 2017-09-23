@@ -19,6 +19,8 @@ from rest_framework.decorators import permission_classes
 
 # from urllib.error import HTTPError
 
+def home(request):
+    return render(request, 'todo/home.html')
 
 def todolist(request):
     todolist = Todo.objects.filter(flag=1)

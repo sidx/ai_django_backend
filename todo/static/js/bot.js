@@ -13,13 +13,16 @@ function handleError(serverError) {
 var $messages = $('.messages-content'),
     d, h, m,
     i = 0;
+var synth = null;
+var text_to_speech = 'on';
 
 $(document).ready(function () {
     $messages.mCustomScrollbar();
     setTimeout(function () {
         if ('speechSynthesis' in window) {
             var i = 1;
-            window.speechSynthesis.onvoiceschanged = function () {
+            synth = window.speechSynthesis;
+            synth.onvoiceschanged = function () {
                 if(i === 1)
                     botResponse('');
                 i++;
@@ -67,6 +70,9 @@ function insertMessage() {
             setTimeout(function () {
                 if (response['result']['action'].match(/smalltalk/g)) {
                     response_message = response['result']['fulfillment']['messages'][0]['speech'];
+                } else if (response['result']['action'].match(/voice/g)){
+                    text_to_speech = response['result']['parameters']['voice'];
+                    response_message = response['result']['fulfillment']['speech'];
                 } else {
                     response_message = response['result']['fulfillment']['speech'];
                 }
@@ -95,7 +101,7 @@ function botResponse(message) {
     if ($('.message-input').val() !== '' || typeof  $('.message-input').val() === 'undefined') {
         return false;
     }
-    $('<div class="message loading new"><figure class="avatar"><img src="/static/img/bot.png" /></figure><span></span></div>').appendTo($('.mCSB_container'));
+    $('<div class="message loading new"><figure class="avatar"><img src="/static/img/jinx.png" /></figure><span></span></div>').appendTo($('.mCSB_container'));
     updateScrollbar();
 
     setTimeout(function () {
@@ -106,15 +112,15 @@ function botResponse(message) {
         if(typeof message === 'undefined'){
             return false;
         }
-        $('<div class="message new"><figure class="avatar"><img src="/static/img/bot.png" /></figure>' + message + '</div>').appendTo($('.mCSB_container')).addClass('new');
-        if ('speechSynthesis' in window) {
+        $('<div class="message new"><figure class="avatar"><img src="/static/img/jinx.png" /></figure>' + message + '</div>').appendTo($('.mCSB_container')).addClass('new');
+        if ('speechSynthesis' in window && text_to_speech === 'on') {
             var msg = new SpeechSynthesisUtterance();
-            var voices = window.speechSynthesis.getVoices();
+            var voices = synth.getVoices();
             msg.voice = voices[3];
             msg.rate = 1;
             msg.pitch = 1;
             msg.text = message;
-            speechSynthesis.speak(msg);
+            synth.speak(msg);
         }
 
         setDate();
